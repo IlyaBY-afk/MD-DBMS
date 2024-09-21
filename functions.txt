@@ -1,0 +1,76 @@
+Функциональные требования:
+
+    – Двухфакторная аутентификация (логин и пароль + подтвержедние по email)
+    – Управление пациентами (CRUD), запись их истории лечения (обследования и их результаты)
+    – Запись пациентов на приёмы к врачам
+    – Ведение статистики по пациентам, врачам, генерация файлов с отчётами
+    – Журналирование  действий пользователя
+
+Сущности:
+    - person: человек
+        * id: INTEGER                       (PK)
+        * first_name:       VARCHAR(64)
+        * last_name:        VARCHAR(64)
+        * birth_date:       DATE
+        * email:            VARCHAR(256) N
+        * mobile:           VARCHAR(256)
+
+    - department: отделение
+        * id: INTEGER                       (PK)
+        * name: VARCHAR(64)
+
+    – nurse: врач
+        * id:               INTEGER         (PK) 
+        * person_id:        INTEGER         (FK, person)
+        * status:           VARCHAR(32)
+
+    - nurse_department: должность врача в отделении
+        * id:               INTEGER         (PK) 
+        * nurse_id:         INTEGER         (FK, nurse)
+        * department_id:    INTEGER         (FK, department)
+        * status:           VARCHAR(32)
+
+    - patient: пациент 
+        * id:               INTEGER         (PK)
+        * person_id:        INTEGER         (FK, person)
+        * status:           VARCHAR(32)
+
+    - schedule: расписание на день
+        * id:               INTEGER         (PK)
+        * nurse_id:         INTEGER         (FK, nurse)
+        * day:              VARCHAR(16)     
+        * time_from:        TIMESTAMP       
+        * time_to:          TIMESTAMP
+
+    – appointment: визит к врачу
+        * id:               INTEGER         (PK)
+        * patient_id:       INTEGER         (FK, patient)
+        * nurse_id:         INTEGER         (FK, nurse)
+        * time:             DATETIME
+
+    - prodedure_referral: направление на процедуры
+        * id:               INTEGER         (PK)
+        * patient_id:       INTEGER         (FK, patient)
+        * nurse_id:         INTEGER         (FK, nurse)
+        * time_from:        TIMESTAMP       
+        * time_to:          TIMESTAMP
+
+    – procedure: процедура
+        * id:               INTEGER         (PK)
+        * referral_id:      INTEGER         (FK, referral)
+        * date:             DATETIME  
+
+    - prescribtion: рецепт
+        * id:               INTEGER         (PK)
+        * appointment_id:   INTEGER         (FK, appointment)
+        * content:          VARCHAR(1024)   
+
+
+Роли:
+    – staff: работник больницы
+        Управление пациентами
+    – nurse: врач
+        Назначение осмотров у врачей, процедур, запись рецептов, изменение статуса пациентов
+    – admin: админ
+        staff + nurse + работа со статистикой
+    
