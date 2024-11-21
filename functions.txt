@@ -6,20 +6,18 @@
     b) Войти в уже созданный им аккаунт.
 2. Авторизованный пользователь (гость) имеет возможность:
     a) Просматривать информацию о пациентах, врачах, услугах и обследованиях, графике работы.
-    b) Управлять своими личными данными (редактировать профиль).
-    c) Экспортировать таблицы в форматах .xlsx и .csv
+    b) Управлять своими личными данными.
+    c) Экспортировать таблицы пациентов, препаратов, расписания в форматах .xlsx и .csv
     d) Экспортировать карточки пациентов, результаты обследований в формате .pdf
 3. Авторизованный пользователь (пользователь) имеет возможность:
     a) Просматривать, редактировать, создавать и удалять информацию о пациентах.
-    b) Назначать пациентам обследования.
-    c) Отслеживать информацию о доступных препаратах, назначать их пациентам.
+    b) Редактировать информацию о палатах.
+    b) Управлять обследованиями и процедурами.
+    c) Создавать, редактировать рецепты.
 4. Администратор имеет возможность:
-    a) просматривать, редактировать, создавать и удалять
-    информацию о пользователях.
-    b) просматривать, редактировать, создавать и удалять роли
-    пользователей, отделения, должности.
-    c) просматривать, редактировать, создавать и удалять услуги.
-    d) просматривать, редактировать, создавать и удалять препараты.
+    a) Просматривать, редактировать, создавать и удалять
+    информацию о пользователях и сотрудниках.
+    b) Просматривать, редактировать, создавать и удалять палаты, услуги, препараты, расписания
 5. В приложении должна присутствовать система ролей, которая
 предоставляет доступ авторизованным пользователям и
 ограничивает неавторизованным.
@@ -27,12 +25,10 @@
 пользователей.
 
 Таблицы в базе данных:
-    1. Таблица "Роль" ("role"):
-        "id"            BIGINT NOT NULL (PK)
-        "name"          VARCHAR(16)
         
-    2. Таблица "Пациент" ("patient:):
+    1. Таблица "Пациент" ("patient)
         "id"            BIGINT NOT NULL (PK)
+        "room_id"       BIGINT          (FK -> room)
         "full_name"     VARCHAR(64)
         "sex"           VARCHAR(1)
         "birth_date"    DATE
@@ -40,33 +36,31 @@
         "phone_number"  VARCHAR(15)
         "email"         VARCHAR(320)
         "card_number"   VARCHAR(8)
+
+    2. Таблица "Палата" ("room")
+        "id"            BIGINT NOT NULL (PK)
+        "staff_id"      BIGINT          (FK -> staff)
+        "number"        INT
+        "max_capacity"  INT
         
     3. Таблица "Сотрудник" ("staff")
         "id"            BIGINT NOT NULL (PK)
         "full_name"     VARCHAR(64)
         "birth_date"    DATE
         "email"         VARCHAR(320)
-        "position"      BIGNT           (FK -> position)
-        "department"    BIGINT          (FK -> department)
-        "role"          BIGINT          (FK -> role)
+        "position"      VARCHAR(32)          
+        "department"    VARCHAR(32)
+        "role"          VARCHAR(32)
         "login"         VARCHAR(32)
         "password"      VARCHAR(32)
 
-    4. Таблица "Отделение" ("department")
-        "id"            BIGINT NOT NULL (PK)
-        "name"          VARCHAR(32)
-
-    6. Таблица "Должность" ("position")
-        "id"            BIGINT NOT NULL (PK)
-        "name"          VARCHAR(32)
-
-    7. Таблица "Услуга" ("service")
+    4. Таблица "Услуга" ("service")
         "id"            BIGINT NOT NULL (PK)
         "name"          VARCHAR(64)
         "duration"      INTEGER
         "price"         DECIMAL(6, 2)
 
-    8. Таблица "Препарат" ("medicine")
+    5. Таблица "Препарат" ("medicine")
         "id"                BIGINT NOT NULL (PK)
         "name"              VARCHAR(32)
         "description"       VARCHAR(256)
@@ -74,40 +68,40 @@
         "amount"            INT
         "waranty"           INT
 
-    9. Таблица "Операция с препаратами" ("medicine_operation")
+    6. Таблица "Операция с препаратами" ("medicine_operation")
         "id"                BIGINT NOT NULL (PK)
         "medicine_id"       BIGINT          (FK -> medicine)
         "operation"         VARCHAR(32)
         "amount"            INT
         "price"             DECIMAL(6, 2)
-        "date"              DATE
+        "date_time"         DATETIME
 
-    10. Таблица "Расписание" ("schedule")
+    7. Таблица "Расписание" ("schedule")
         "id"                BIGINT NOT NULL (PK)
         "staff_id"          BIGINT          (FK -> staff)
         "patient_id"        BIGINT          (FK -> patient)
-        "paid"              BOOLEAN
         "abscent"           BOOLEAN
         "date_time"         DATETIME
 
-    11. Таблица "Обследование" ("examination")
+    8. Таблица "Обследование" ("examination")
         "id"                BIGINT NOT NULL (PK)
         "schedule_id"       BIGINT          (FK -> schedule)
         "type"              VARCHAR(32)
         "disease"           VARCHAR(128)
-        "result"            VARCHAR(256)
+        "result"            TEXT
 
-    12. Таблица "Оказанная услуга ("provided_service")
+    9. Таблица "Оказанная услуга ("provided_service")
         "id"                BIGINT NOT NULL (PK)
         "service_id"        BIGINT          (FK -> service)
         "schedule_id"       BIGINT          (FK -> schedule)
 
-    13. Таблица "Рецепт" ("prescribtion")
+    10. Таблица "Рецепт" ("prescription")
         "id"                BIGINT NOT NULL (PK)
         "examination_id"    BIGINT          (FK -> examination)
         "medicine_id"       BIGINT          (FK -> medicine)
+        "notes"             VARCHAR(256)
 
-    14. Таблица "Оплата" ("purchase")
+    11. Таблица "Оплата" ("purchase")
         "id"                BIGINT NOT NULL (PK)
         "service_id"        BIGINT          (FK -> service)
         "patient_id"        BIGINT          (FK -> patient)
